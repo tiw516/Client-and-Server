@@ -1,0 +1,113 @@
+import java.io.*;
+import java.net.*;
+import java.util.ArrayList;
+import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+/**
+ *
+ * @author TiantongWu
+ */
+public class JavaApplication3 {
+ 
+    public static void main(String[] Args) throws IOException
+	{
+		
+            ArrayList<String> newsite = new ArrayList<String>();
+            
+            
+            Scanner s = new Scanner(System.in);
+            System.out.print("URL: ");
+            String urladdress = s.next();
+            System.out.print("Enter int number: ");
+            int num = s.nextInt();
+            newsite = connectweb(urladdress);
+            if (num<=0){
+  //              NewSites = connect(urladdress);
+                  System.out.print(newsite);
+                  //System.out.print(newsite.size());
+ //               System.out.println(NewSites);
+            }else{
+      
+                 for (int n=0; n<num; n++){
+                     for (int m=0; m < newsite.size(); m++){
+                         String newurl = newsite.get(m);
+                         ArrayList<String> up = new ArrayList<String>();
+                         up = connectweb(newurl);
+                         if (!up.isEmpty()){
+                             System.out.print(up);
+                         }
+                         
+                 }
+                 System.out.print(newsite);
+                }
+    
+            }
+            
+
+	}
+    
+    public static String pullLinks(String text) {
+ 
+        String regex = "\\(?\\b(http://|www[.])[-A-Za-z0-9+&amp;@#/%?=~_()|!:,.;]*[-A-Za-z0-9+&amp;@#/%=~_()|]";
+        Pattern p = Pattern.compile(regex);
+        Matcher m = p.matcher(text);
+        if (m.find()){
+            String urlStr = m.group();
+            return urlStr;
+        }else{
+            return "";
+        }
+        
+    }
+
+    
+ 
+        
+        public static ArrayList connectweb(String URL) {
+            try{
+                
+            
+            
+            InetAddress addr = InetAddress.getByName(URL);
+            Socket socket = new Socket(addr, 80);
+            boolean autoflush = true;
+            PrintWriter out = new PrintWriter(socket.getOutputStream(), autoflush);
+            BufferedReader in = new BufferedReader(
+
+            new InputStreamReader(socket.getInputStream()));
+            out.println("GET / HTTP/1.1");
+            out.println("Host: " + URL +":80");
+            out.println("Connection: Close");
+            out.println();
+            
+            String data = in.readLine();
+            
+            ArrayList<String> result = new ArrayList<String>();
+
+			while(data != null)
+			{
+                            String temp = pullLinks(data);   
+                            if (!temp.isEmpty()){
+                                //result = result + pullLinks(data);
+				result.add(temp);
+                            }
+                            
+                            data = in.readLine();
+                                
+                                
+			}
+                        //String result = pullLinks(data);
+                        //return result;
+
+    
+            socket.close();
+            return result;
+        }    
+        
+        catch(Exception E){
+            ArrayList<String> empty = new ArrayList<String>();
+        return empty;}
+        }
+}
